@@ -10,16 +10,35 @@ const seed:EventItem[]=[
  {id:'3',title:'読書 20ページ',date:iso(new Date(today.getFullYear(),today.getMonth(),today.getDate()+1)),category:'study',priority:'low',completed:false},
 ]
 
-type State={events:EventItem[];settings:AppSettings;selectedDate:string;setSelectedDate:(d:string)=>void;setTheme:(t:Theme)=>void;toggleDone:(id:string)=>void;addEvent:(e:Omit<EventItem,'id'|'completed'>)=>void;updateEvent:(e:EventItem)=>void;deleteEvent:(id:string)=>void;reset:()=>void}
-const initial=()=>{try{const v=JSON.parse(localStorage.getItem(key)||'');return v.events?{events:v.events,settings:{...v.settings}}:null}catch{return null}}
+const defaultSettings:AppSettings={theme:'violet',weekStartsMonday:true,reducedMotion:false,showHolidays:true}
+
+type State={
+ events:EventItem[]
+ settings:AppSettings
+ selectedDate:string
+ setSelectedDate:(d:string)=>void
+ setTheme:(t:Theme)=>void
+ setShowHolidays:(show:boolean)=>void
+ toggleDone:(id:string)=>void
+ addEvent:(e:Omit<EventItem,'id'|'completed'>)=>void
+ updateEvent:(e:EventItem)=>void
+ deleteEvent:(id:string)=>void
+ reset:()=>void
+}
+const initial=()=>{try{const v=JSON.parse(localStorage.getItem(key)||'');return v.events?{events:v.events,settings:{...defaultSettings,...v.settings}}:null}catch{return null}}
 const saved=initial()
-export const useStore=create<State>((set,get)=>({
- events:saved?.events||seed, settings:saved?.settings||{theme:'violet',weekStartsMonday:true,reducedMotion:false}, selectedDate:iso(today),
- setSelectedDate:d=>set({selectedDate:d}), setTheme:theme=>set(s=>({...s,settings:{...s.settings,theme}})),
+export const useStore=create<State>((set)=>({
+ events:saved?.events||seed,
+ settings:saved?.settings||defaultSettings,
+ selectedDate:iso(today),
+ setSelectedDate:d=>set({selectedDate:d}),
+ setTheme:theme=>set(s=>({...s,settings:{...s.settings,theme}})),
+ setShowHolidays:showHolidays=>set(s=>({...s,settings:{...s.settings,showHolidays}})),
  toggleDone:id=>set(s=>({events:s.events.map(e=>e.id===id?{...e,completed:!e.completed}:e)})),
  addEvent:e=>set(s=>({events:[...s.events,{...e,id:crypto.randomUUID(),completed:false}]})),
- updateEvent:e=>set(s=>({events:s.events.map(x=>x.id===e.id?e:x)})), deleteEvent:id=>set(s=>({events:s.events.filter(e=>e.id!==id)})),
- reset:()=>set({events:seed,settings:{theme:'violet',weekStartsMonday:true,reducedMotion:false}})
+ updateEvent:e=>set(s=>({events:s.events.map(x=>x.id===e.id?e:x})),
+ deleteEvent:id=>set(s=>({events:s.events.filter(e=>e.id!==id)})),
+ reset:()=>set({events:seed,settings:defaultSettings})
 }))
 useStore.subscribe(s=>{try{localStorage.setItem(key,JSON.stringify({events:s.events,settings:s.settings}))}catch{}})
 export {iso}
