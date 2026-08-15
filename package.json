@@ -3,7 +3,19 @@
   "private": true,
   "version": "6.0.0",
   "type": "module",
-  "scripts": {"dev":"vite","build":"tsc -b && vite build","preview":"vite preview"},
-  "dependencies": {"@vitejs/plugin-react":"latest","vite":"latest","typescript":"latest","react":"latest","react-dom":"latest","zustand":"latest","dexie":"latest"},
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build && cp manifest.json sw.js icon-192.png icon-512.png icon-192-sakura.png icon-512-sakura.png dist/",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "typescript": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "zustand": "latest",
+    "dexie": "latest"
+  },
   "devDependencies": {}
 }
